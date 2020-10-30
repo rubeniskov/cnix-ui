@@ -1,0 +1,27 @@
+{
+  "name": "@cnix-ui/store",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "cnix-ui-scripts test",
+    "build": "cnix-ui-scripts build",
+    "prepare": "cnix-ui-scripts prepare",
+    "storybook": "cnix-ui-scripts storybook",
+    "link": "cnix-ui-scripts link",
+    "e2e": "cnix-ui-scripts e2e",
+    "prepublishOnly": "cnix-ui-scripts prepublish",
+    "clean": "cnix-ui-scripts clean"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@apollo/client": "^3.2.5",
+    "apollo-boost": "^0.4.9",
+    "graphql": "^15.4.0"
+  },
+  "devDependencies": {
+    "@cnix-ui/scripts": "^0.0.1",
+    "@cnix-ui/babel-preset-react": "^0.0.1"
+  }
+}

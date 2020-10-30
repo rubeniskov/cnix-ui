@@ -1,0 +1,38 @@
+#!/usr/bin/env node
+const debug = require('debug')('@cnix-ui/typescript');
+const path = require('path');
+const { promisify } = require('util');
+const glob = promisify(require('glob'));
+const execa = require('execa');
+
+const main = async () => {
+  const files = await glob(`${process.argv[2]}/{*.js,**/*.js}`, {
+    cwd: process.cwd(),
+  });
+
+  const binPath = path.resolve(__dirname, 'node_modules', '.bin', 'tsc');
+
+  const args = [
+    ...files,
+    '--declaration',
+    '--allowJs',
+    '--emitDeclarationOnly',
+    '--outDir',
+    'src/*.js',
+    '--jsx',
+    'react',
+    ...process.argv.slice(4),
+  ];
+
+  debug('launching "%s %s"', binPath, args);
+
+  await execa(binPath, args, {
+    cwd: process.cwd(),
+    stdio: [0, 1, 2],
+  }).catch(({ exitCode, message }) => {
+    console.error(message);
+    process.exit(exitCode);
+  });
+};
+
+main();

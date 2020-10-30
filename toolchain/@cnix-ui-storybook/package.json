@@ -1,0 +1,31 @@
+{
+  "name": "@cnix-ui/storybook",
+  "version": "0.0.1",
+  "description": "",
+  "bin": {
+    "cnix-ui-storybook": "bin"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "react-is": "^16.8.0",
+    "typescript": "3.9.4",
+    "@storybook/addons": "^6.0.28",
+    "@storybook/components": "^6.0.28",
+    "@storybook/core-events": "^6.0.28",
+    "@storybook/theming": "^6.0.28",
+    "@storybook/api": "^6.0.28",
+    "@storybook/addon-controls": "^6.0.28",
+    "@storybook/addon-essentials": "^6.0.28",
+    "@storybook/react": "^6.0.28",
+    "debug": "^4.2.0",
+    "execa": "^4.1.0",
+    "resolve-bin": "^0.4.0",
+    "storybook-dark-mode": "^1.0.3"
+  }
+}

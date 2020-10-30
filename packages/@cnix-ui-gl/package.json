@@ -1,0 +1,35 @@
+{
+  "name": "@cnix-ui/gl",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "cnix-ui-scripts build",
+    "prepare": "cnix-ui-scripts prepare",
+    "storybook": "cnix-ui-scripts storybook",
+    "link": "cnix-ui-scripts link",
+    "clean": "cnix-ui-scripts clean",
+    "e2e": "cnix-ui-scripts e2e",
+    "prepublishOnly": "cnix-ui-scripts prepublish",
+    "test": "cnix-ui-scripts test"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "gl-context": "^0.1.1",
+    "gl-geometry": "^3.1.1",
+    "gl-mat4": "^1.2.0",
+    "gl-quad": "^1.1.3",
+    "gl-reset": "^1.0.0",
+    "gl-shader": "^4.2.1",
+    "glsl-blend-overlay": "^1.0.5",
+    "glsl-random": "0.0.5",
+    "glslify": "^7.1.1",
+    "raf-component": "^1.1.2"
+  },
+  "devDependencies": {
+    "@cnix-ui/babel-preset-env": "^0.0.1",
+    "@cnix-ui/test": "v0.0.1",
+    "@cnix-ui/scripts": "^0.0.1"
+  }
+}

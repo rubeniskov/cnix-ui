@@ -1,0 +1,9 @@
+{
+  "name": "@cnix-ui/babel-preset-env",
+  "version": "0.0.1",
+  "main": "index.js",
+  "dependencies": {
+    "@babel/helper-plugin-utils": "^7.10.4",
+    "@babel/preset-env": "^7.12.1"
+  }
+}

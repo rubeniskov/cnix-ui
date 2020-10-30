@@ -1,0 +1,12 @@
+{
+  "name": "@cnix-ui/babel",
+  "version": "0.0.1",
+  "description": "Unified babel transpiler config for cnix-ui",
+  "bin": {
+    "cnix-ui-babel": "node_modules/.bin/babel"
+  },
+  "dependencies": {
+    "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3"
+  }
+}

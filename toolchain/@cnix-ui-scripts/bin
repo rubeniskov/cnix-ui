@@ -1,0 +1,136 @@
+#!/usr/bin/env node
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable import/no-dynamic-require */
+/* eslint-disable global-require */
+const debug = require('debug')('@cnix-ui/scripts');
+const interpolate = require('interpolate');
+const execa = require('execa');
+
+const path = require('path');
+
+const mainArgv = process.argv.slice(2);
+const mainCmd = mainArgv[0];
+const {
+  directories: {
+    lib: outputDirectory = './lib',
+    src: sourceDirectory = './src',
+    types: typesDirectory = './types',
+  } = {},
+} = require(path.resolve(process.cwd(), 'package.json'));
+
+const scriptsStackSep = '/';
+const cnixUIScriptsStack = `${(process.env.cnix_ui_scripts_stack || '')}${scriptsStackSep}${mainCmd}`;
+const defaults = {
+  sourceDirectory,
+  outputDirectory,
+  typesDirectory,
+  scriptStack: cnixUIScriptsStack,
+  linkDirectory: cnixUIScriptsStack.split(scriptsStackSep).includes('prepublish')
+    ? outputDirectory
+    : sourceDirectory,
+  port: 9011,
+  self: __dirname,
+  bin: path.resolve(__dirname, 'node_modules', '.bin'),
+};
+
+// https://en.wikipedia.org/wiki/Smoke_testing_(software)
+// const smokeTest = true;
+
+const scripts = {
+  init: '{self}/scripts/init {args}',
+  typescript: '{bin}/cnix-ui-typescript {sourceDirectory} {typesDirectory}',
+  link: '{self}/scripts/nlink {linkDirectory} --expose default {args}',
+  clean: [
+    'npm run link -- --clean',
+    '{bin}/rimraf {outputDirectory}',
+  ],
+  build: [
+    'npm run clean',
+    '{bin}/cnix-ui-babel {sourceDirectory} --out-dir {outputDirectory} --ignore "*.{test,spec}.js" {args}',
+    '{bin}/cnix-ui-typescript {sourceDirectory} {typesDirectory}',
+    `npm run link`,
+  ],
+  prepare: [
+    'npm run build',
+  ],
+  prepublish: [
+    'npm run test',
+  ],
+  storybook: '{bin}/cnix-ui-storybook {sourceDirectory}/**/*.stories.js --port {port} --no-dll {args}',
+  test: '{bin}/cnix-ui-test {sourceDirectory}/**/*.test.js {args}',
+  e2e: {
+    pipeline: [
+      [
+        'npm run storybook -- --quiet --ci --no-version-updates --no-release-notes',
+        '{bin}/cnix-ui-e2e {sourceDirectory}/**/*.spec.js --port {port} {args}',
+      ],
+    ],
+  },
+};
+
+if (!scripts[mainCmd]) {
+  throw new Error(`missing command "${mainCmd}"`);
+}
+
+const normalizeParam = (param) => (Array.isArray(param) ? param.join(' ') : param) || '';
+const parseScriptArgv = (evalArgv = {}, argv, defs) => Object
+  .entries(evalArgv).reduce((prev, [
+    name,
+    evaluate,
+  ]) => ({
+    ...prev, [name]: normalizeParam(evaluate(argv)),
+  }), {
+    args: normalizeParam(argv.slice(1)),
+    ...defs,
+  });
+
+const execScript = (command, args) => {
+  const [bin, ...argv] = interpolate(command, args).split(' ');
+  debug('starting "%s %s"', bin, argv.join(' '));
+  return execa(bin, argv.filter(Boolean), {
+    cwd: process.cwd(),
+    env: {
+      ...process.env,
+      cnix_ui_scripts_stack: cnixUIScriptsStack,
+    },
+    stdio: [0, 1, 2],
+  });
+};
+
+const parseScript = (script) => {
+  let parsedScript = script;
+  if (typeof script === 'string') {
+    parsedScript = { pipeline: [scripts[mainCmd]] };
+  } else if (Array.isArray(scripts[mainCmd])) {
+    parsedScript = { pipeline: scripts[mainCmd] };
+  }
+  return {
+    ...parsedScript,
+    pipeline: Array.isArray(parsedScript.pipeline)
+      ? parsedScript.pipeline
+      : [parsedScript.pipeline],
+    argv: parseScriptArgv(parsedScript.argv, mainArgv, defaults),
+  };
+};
+
+const main = async () => {
+  const script = parseScript(scripts[mainCmd]);
+  for await (const command of script.pipeline) {
+    const pipeline = Array.isArray(command) ? command : [command];
+    await Promise.all(pipeline
+      .map((cmd) => execScript(cmd, script.argv))
+      .map((proc, _, procs) => proc.then(() => {
+        procs.forEach((cproc) => {
+          cproc.cancel();
+        });
+      }, ({ isCanceled, message }) => {
+        if (!isCanceled) {
+          // eslint-disable-next-line no-console
+          console.error(message);
+          process.exit(1);
+        }
+      })));
+  }
+};
+
+main();

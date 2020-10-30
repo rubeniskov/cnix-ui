@@ -1,0 +1,16 @@
+{
+  "name": "@cnix-ui/babel-plugin-svg-icons",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/helper-plugin-utils": "^7.10.4",
+    "@babel/types": "^7.12.6",
+    "cheerio": "^1.0.0-rc.3"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "@cnix-ui/styles",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "cnix-ui-scripts test",
+    "build": "cnix-ui-scripts build",
+    "prepare": "cnix-ui-scripts prepare",
+    "storybook": "cnix-ui-scripts storybook",
+    "link": "cnix-ui-scripts link",
+    "e2e": "cnix-ui-scripts e2e",
+    "prepublishOnly": "cnix-ui-scripts prepublish",
+    "clean": "cnix-ui-scripts clean"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^16.14.0",
+    "clsx": "^1.1.1",
+    "hoist-non-react-statics": "^3.3.2",
+    "jss-plugin-camel-case": "^10.4.0",
+    "jss-plugin-default-unit": "^10.4.0",
+    "jss-plugin-global": "^10.4.0",
+    "jss-plugin-nested": "^10.4.0",
+    "jss-plugin-props-sort": "^10.4.0",
+    "jss-plugin-rule-value-function": "^10.4.0",
+    "jss-plugin-template": "^10.4.0",
+    "jss-plugin-vendor-prefixer": "^10.4.0",
+    "react-jss": "^10.4.0"
+  },
+  "peerDependencies": {
+    "react": "^16.14.0",
+    "prop-types": "^15.7.2"
+  },
+  "devDependencies": {
+    "@cnix-ui/babel-preset-react": "^0.0.1",
+    "react": "^16.14.0",
+    "prop-types": "^15.7.2",
+    "@cnix-ui/scripts": "^0.0.1"
+  }
+}

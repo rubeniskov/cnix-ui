@@ -1,0 +1,53 @@
+#!/usr/bin/env node
+/* eslint-disable no-console */
+const debug = require('debug')('@cnix-ui/storybook');
+const execa = require('execa');
+const path = require('path');
+
+const kebabCase = (string) => string.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/\s+/g, '-').toLowerCase();
+
+const parseArgs = (argv, defs) => [argv, Object.entries(defs).reduce((prev, [name, type]) => {
+  const isBool = type === Boolean;
+  const index = argv.findIndex((arg) => arg === `--${kebabCase(name)}`);
+  let value;
+  if (index !== -1) {
+    value = argv[index + 1];
+    argv.splice(index, isBool ? 1 : 2);
+  }
+  return { ...prev, [name]: type(value) };
+}, {})];
+
+const [argv, {
+  port, dev,
+}] = parseArgs(process.argv.slice(2), {
+  port: Number,
+  dev: Boolean,
+});
+
+const [pattern, ...restArgs] = argv;
+
+const binPath = path.resolve(__dirname, 'node_modules', '.bin', 'start-storybook');
+
+const args = [
+  '--config-dir',
+  path.resolve(__dirname, '.storybook'),
+  ...process.argv.slice(3),
+];
+
+debug('launching "%s %s"', binPath, args.join(' '));
+
+execa(binPath, args, {
+  env: {
+    ...process.env,
+    // NODE_OPTIONS: [
+    // ...(process.env.NODE_OPTIONS || []),
+    // debugFlag && '--inspect-brk'].filter(Boolean).join(' '),
+    STORYBOOK_DISPLAY_WARNING: true,
+    DISPLAY_WARNING: true,
+  },
+  cwd: process.cwd(),
+  stdio: [0, 1, 2],
+}).catch(({ exitCode, message }) => {
+  console.error(message);
+  process.exit(exitCode);
+});

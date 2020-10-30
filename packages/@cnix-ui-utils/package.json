@@ -1,0 +1,28 @@
+{
+  "name": "@cnix-ui/utils",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "cnix-ui-scripts test",
+    "build": "cnix-ui-scripts build",
+    "prepare": "cnix-ui-scripts prepare",
+    "storybook": "cnix-ui-scripts storybook",
+    "link": "cnix-ui-scripts link",
+    "e2e": "cnix-ui-scripts e2e",
+    "prepublishOnly": "cnix-ui-scripts prepublish",
+    "clean": "cnix-ui-scripts clean"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "react": "^16.14.0",
+    "@cnix-ui/core": "^0.0.1",
+    "@cnix-ui/scripts": "^0.0.1",
+    "@cnix-ui/babel-preset-react": "^0.0.1"
+  },
+  "peerDependencies": {
+    "react": "^16.14.0",
+    "@cnix-ui/core": "^0.0.1"
+  }
+}

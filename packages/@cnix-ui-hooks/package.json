@@ -1,0 +1,30 @@
+{
+  "name": "@cnix-ui/hooks",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "isolated-scroll": "^0.1.0"
+  },
+  "devDependencies": {
+    "react": "^16.14.0",
+    "@cnix-ui/scripts": "v0.0.1",
+    "@cnix-ui/gl": "v0.0.1"
+  },
+  "peerDependencies": {
+    "react": "^16.14.0",
+    "@cnix-ui/gl": "v0.0.1"
+  },
+  "scripts": {
+    "build": "cnix-ui-scripts build",
+    "prepare": "cnix-ui-scripts prepare",
+    "storybook": "cnix-ui-scripts storybook",
+    "link": "cnix-ui-scripts link",
+    "test": "cnix-ui-scripts test",
+    "e2e": "cnix-ui-scripts e2e",
+    "prepublishOnly": "cnix-ui-scripts prepublish",
+    "clean": "cnix-ui-scripts clean"
+  }
+}

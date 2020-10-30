@@ -1,0 +1,80 @@
+{
+  "name": "@cnix-ui/packages",
+  "version": "0.0.1",
+  "description": "",
+  "private": true,
+  "engines": {
+    "yarn": ">=1.5.0"
+  },
+  "author": "rubeniskov <me@rubeniskov.com> (http://rubeniskov.com)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rubeniskov/cnix-ui.git"
+  },
+  "workspaces": {
+    "packages": [
+      "packages/*",
+      "toolchain/*",
+      "toolchain/@cnix-ui-babel/{presets,plugins}/*"
+    ],
+    "nohoist": [
+      "**/@storybook/*",
+      "**/@storybook/*/react"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint",
+      "pre-push": "npm run lint && npm test"
+    }
+  },
+  "scripts": {
+    "exec": "lerna exec --",
+    "lrun": "lerna run",
+    "init": "npm run exec cnix-ui-scripts init",
+    "test": "npm run lrun test",
+    "link": "npm run lrun link",
+    "prelint": "npm run bootstrap",
+    "lint": "eslint packages/*/src",
+    "lint:fix": "eslint packages/*/src --fix",
+    "build": "npm run lrun build",
+    "bootstrap": "lerna bootstrap",
+    "prepublishOnly": "npm run lrun test",
+    "prepare": "lerna bootstrap",
+    "clean": "lerna clean --yes",
+    "start": "webpack serve"
+  },
+  "dependencies": {
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "prop-types": "^15.7.2"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-react": "^7.12.5",
+    "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-module-resolver": "^4.0.0",
+    "error-overlay-webpack-plugin": "^0.4.1",
+    "eslint": "^7.13.0",
+    "eslint-config-airbnb": "^18.2.1",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-plugin-cypress": "^2.11.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-react-hooks": "^4.2.0",
+    "glob": "^7.1.6",
+    "html-webpack-plugin": "^5.0.0-alpha.13",
+    "husky": "^4.3.0",
+    "ify-loader": "rubeniskov/ify-loader",
+    "lerna": "^3.22.1",
+    "npm-run-all": "^4.1.5",
+    "webpack": "^5.4.0",
+    "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^3.11.0"
+  }
+}

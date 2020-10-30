@@ -1,0 +1,38 @@
+{
+  "name": "@cnix-ui/icons",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "cnix-ui-scripts test",
+    "build": "cnix-ui-scripts build",
+    "prebuild": "./scripts/gen-icons icons.svg src",
+    "postbuild": "eslint src --fix",
+    "prepare": "cnix-ui-scripts prepare",
+    "storybook": "cnix-ui-scripts storybook",
+    "link": "cnix-ui-scripts link",
+    "e2e": "cnix-ui-scripts e2e",
+    "prepublishOnly": "cnix-ui-scripts prepublish",
+    "clean": "cnix-ui-scripts clean"
+  },
+  "author": "",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "^16.14.0"
+  },
+  "devDependencies": {
+    "@cnix-ui/babel-preset-react": "^0.0.1",
+    "@cnix-ui/core": "^0.0.1",
+    "@cnix-ui/scripts": "^0.0.1",
+    "@cnix-ui/utils": "^0.0.1",
+    "cheerio": "^1.0.0-rc.3",
+    "eslint": "^7.13.0",
+    "interpolate": "^0.1.0",
+    "lodash.camelcase": "^4.3.0",
+    "lodash.upperfirst": "^4.3.1",
+    "react": "^16.14.0",
+    "svgo": "^1.3.2",
+    "svgpath": "^2.3.0",
+    "yargs": "^16.1.0"
+  }
+}

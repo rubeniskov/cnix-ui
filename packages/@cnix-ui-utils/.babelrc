@@ -1,0 +1,5 @@
+{
+  "presets": [
+    "@cnix-ui/babel-preset-react"
+  ]
+}

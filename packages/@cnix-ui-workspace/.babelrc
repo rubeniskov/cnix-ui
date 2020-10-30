@@ -1,0 +1,12 @@
+{
+  "presets": [
+    "@cnix-ui/babel-preset-react"
+  ],
+  "plugins": [
+    [ "import-to-require", {
+      "modules": [
+        "glslify"
+      ]
+    }]
+  ]
+}

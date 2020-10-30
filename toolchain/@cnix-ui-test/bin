@@ -1,0 +1,35 @@
+#!/usr/bin/env node
+/* eslint-disable no-console */
+const debug = require('debug')('@cnix-ui/test');
+const execa = require('execa');
+const { existsSync, linkSync } = require('fs');
+const path = require('path');
+
+const [pattern, ...restArgs] = process.argv.slice(2);
+
+const binPath = path.resolve(__dirname, 'node_modules', '.bin', 'nyc');
+
+const configName = '.test.cjs';
+const configPath = path.resolve(process.cwd(), configName);
+if (!existsSync(configPath)) {
+  linkSync(path.resolve(__dirname, 'test.cjs'), configPath);
+}
+
+const args = [
+  path.resolve(__dirname, 'node_modules', '.bin', 'ava'),
+  pattern,
+  '-v',
+  '--config',
+  configName,
+  ...restArgs
+];
+
+debug('launching "%s %s"', binPath, args);
+
+execa(binPath, args, {
+  cwd: process.cwd(),
+  stdio: [0, 1, 2],
+}).catch(({ exitCode, message }) => {
+  console.error(message);
+  process.exit(exitCode);
+});

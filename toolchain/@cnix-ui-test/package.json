@@ -1,0 +1,23 @@
+{
+  "name": "@cnix-ui/test",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "cnix-ui-test": "bin"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@babel/register": "^7.12.1",
+    "ava": "^3.13.0",
+    "browser-env": "^3.3.0",
+    "debug": "^4.2.0",
+    "execa": "^4.1.0",
+    "nyc": "^15.1.0",
+    "sinon": "^9.2.1"
+  }
+}

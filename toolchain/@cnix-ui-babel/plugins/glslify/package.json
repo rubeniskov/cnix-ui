@@ -1,0 +1,7 @@
+{
+  "name": "@cnix-ui/babel-plugin-glslify",
+  "version": "0.0.1",
+  "dependencies": {
+    "babel-plugin-import-to-require": "^1.0.0"
+  }
+}

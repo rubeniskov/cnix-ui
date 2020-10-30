@@ -1,0 +1,61 @@
+#!/usr/bin/env node
+
+const path = require('path');
+const fs = require('fs');
+const { promisify } = require('util');
+
+const writeFile = promisify(fs.writeFile);
+const glob = promisify(require('glob'));
+
+const mkdirp = promisify(fs.mkdir);
+const rimraf = promisify(require('rimraf'));
+
+const main = async (argv) => {
+  const argDir = argv[1] || 'src';
+  const cwdDir = process.cwd();
+  const scanDir = path.join(cwdDir, argDir);
+  const cleanFlag = argv.includes('--clean');
+  const expose = argv.find((_, idx, _argv) => _argv[idx - 1] === '--expose');
+
+  const files = await glob('{*.js,**/*.js}', {
+    // Restrict scan directory
+    cwd: scanDir,
+    // Retrieve relative paths
+    absolute: false,
+    // Ignore files that it being used in local only by its sibling
+    ignore: '**/*.{spec,test,stories}.js',
+  });
+
+  const rootFiles = files
+    .map((file) => file.split(path.sep)[0])
+    .filter((file, index, self) => self.indexOf(file) === index && file !== '.');
+
+  process.stderr.write(`${files.length} Files detected!\n`);
+
+  if (cleanFlag) {
+    const filesToRemove = rootFiles.filter((file) => fs.existsSync(file));
+    await Promise.all(filesToRemove.map((file) => rimraf(file)));
+    process.stderr.write(`${filesToRemove.length} Files cleaned!\n`);
+  } else {
+    const dirsToCreate = files
+      .map((file) => path.dirname(file))
+      .filter((file, index, self) => self.indexOf(file) === index && file !== '.')
+      .filter((file) => fs.lstatSync(path.resolve(cwdDir, argDir, file)).isDirectory())
+      .filter((file) => !fs.existsSync(file));
+    await Promise.all(dirsToCreate.map((file) => mkdirp(file, { recursive: true })));
+    if (dirsToCreate.length) {
+      process.stderr.write(`${dirsToCreate.length} Directories created!\n`);
+    }
+    await Promise.all(files.map((file) => {
+      const relPath = path.relative(path.dirname(path.join(cwdDir, file)), path.join(argDir, file)).replace(/\\/gi, '/');
+      const moduleExport = `module.exports = require('./${relPath}')${expose ? `.${expose}` : ''};\n`;
+
+      return writeFile(path.join(cwdDir, file), moduleExport);
+    }));
+    if (files.length) {
+      process.stderr.write(`${files.length} Files linked!\n`);
+    }
+  }
+};
+
+main(process.argv.slice(1));

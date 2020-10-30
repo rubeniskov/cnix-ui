@@ -1,0 +1,10 @@
+{
+  "name": "@cnix-ui/babel-preset-glslify",
+  "version": "0.0.1",
+  "main": "index.js",
+  "dependencies": {
+    "@babel/helper-plugin-utils": "^7.10.4",
+    "babel-plugin-glslify": "rubeniskov/babel-plugin-glslify",
+    "babel-plugin-import-to-require": "^1.0.0"
+  }
+}

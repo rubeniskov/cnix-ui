@@ -1,0 +1,26 @@
+# It is best to ignoring editor and system files in a local .gitignore configuration file.
+# However, in order to prevent issues, they are ignored here.
+.DS_STORE
+.idea
+*.log
+/.eslintcache
+/dist
+/.nyc_output
+/benchmark/**/dist
+/coverage
+/tmp
+node_modules
+package-lock.json
+yarn.lock
+
+/packages/*/*
+!/packages/*/.npmignore
+!/packages/*/.gitignore
+!/packages/*/.babelrc
+!/packages/*/README.md
+!/packages/*/LICENSE
+!/packages/*/src
+!/packages/*/docs
+!/packages/*/test
+!/packages/*/scripts
+!/packages/*/package.json

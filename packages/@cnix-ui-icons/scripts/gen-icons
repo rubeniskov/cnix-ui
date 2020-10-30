@@ -1,0 +1,205 @@
+#!/usr/bin/env node
+/* eslint-disable no-bitwise */
+/* eslint-disable no-param-reassign */
+/* eslint-disable import/no-dynamic-require */
+/* eslint-disable global-require */
+/* eslint-disable import/no-extraneous-dependencies */
+const SVGO = require('svgo');
+const svgpath = require('svgpath');
+const cheerio = require('cheerio');
+const interpolate = require('interpolate');
+const fs = require('fs');
+const path = require('path');
+const { promisify } = require('util');
+const camelCase = require('lodash.camelcase');
+const upperFirst = require('lodash.upperfirst');
+
+const writeFile = promisify(fs.writeFile);
+const readFile = promisify(fs.readFile);
+
+const pascalCase = (str) => upperFirst(camelCase(str));
+const all = Promise.all.bind(Promise);
+
+const extractSvg = (content, selector) => {
+  const $ = cheerio.load(content);
+  return $(selector).toArray()
+    .map((elem) => ({
+      name: cheerio(elem).attr('id'),
+      data: cheerio.xml(elem, {
+        decodeEntities: false,
+      }).replace(/(\n|\t)/g, ''),
+    }));
+};
+
+const formatIconJs = async (templatePath, data) => {
+  const template = await readFile(templatePath, { encoding: 'utf8' });
+  return interpolate(template, data, { delimiter: '{{}}' });
+}
+
+const svgoDefaults = {
+  floatPrecision: 4,
+  plugins: [
+    { cleanupAttrs: true },
+    { removeDoctype: true },
+    { removeXMLProcInst: true },
+    { removeComments: true },
+    { removeMetadata: true },
+    { removeTitle: true },
+    { removeDesc: true },
+    { removeUselessDefs: true },
+    { removeXMLNS: true },
+    { removeEditorsNSData: true },
+    { removeEmptyAttrs: true },
+    { removeHiddenElems: true },
+    { removeEmptyText: true },
+    { removeEmptyContainers: true },
+    { cleanupEnableBackground: true },
+    { convertStyleToAttrs: true },
+    { convertColors: true },
+    { convertPathData: true },
+    { convertTransform: true },
+    { removeUnknownsAndDefaults: true },
+    { removeNonInheritableGroupAttrs: true },
+    {
+      removeUselessStrokeAndFill: {
+        removeNone: true,
+      },
+    },
+    { removeUnusedNS: true },
+    { cleanupIDs: true },
+    { cleanupNumericValues: true },
+    { cleanupListOfValues: true },
+    { moveElemsAttrsToGroup: true },
+    { moveGroupAttrsToElems: true },
+    { collapseGroups: true },
+    { removeRasterImages: true },
+    { mergePaths: true },
+    { convertShapeToPath: true },
+    { sortAttrs: true },
+    { removeDimensions: true },
+    { removeAttrs: true },
+    { removeElementsByAttr: true },
+    { removeStyleElement: true },
+    { removeScriptElement: true },
+  ],
+};
+
+const resolveCwd = (resolvePath) => path.resolve(process.cwd(), resolvePath);
+
+const resolveFormatName = (filename, fallback = (a) => a) => (filename
+  ? require(resolveCwd(filename)) : fallback);
+
+const parseUnits = (mixed, len) => {
+  const res = [];
+  const units = Array.isArray(mixed) ? mixed : `${mixed}`.split(/[,\s]+/);
+  const unitsLen = units.length;
+  if (unitsLen % 2 === 1 && unitsLen !== 1) {
+    throw new Error(`Units "${mixed}" length must be odd or one`);
+  }
+  for (let i = 0; i < len; i += 1) {
+    res[i] = units[i % unitsLen];
+  }
+  return res.map(Number);
+};
+
+const parseMargins = (mixed) => parseUnits(mixed, 4);
+const parseGaps = (mixed) => parseUnits(mixed, 2);
+const parseSizes = (mixed) => parseUnits(mixed, 2);
+
+// https://developer.mozilla.org/es/docs/Web/CSS/margin
+//
+// margins: [ top, right, bottom, left ]
+// margins: [ vertical, horizontal ]
+// margins: [ all ]
+//
+// gaps: [ vertical, hotizontal ]
+// gaps: [ all ]
+//
+// sizes: [ height, width ]
+// sizes: [ all ]
+//
+// viewport: [ height, width ]
+// viewport: [ all ]
+//
+//    MLeft    VGap    VGap    MRight
+//       ↓       ↓       ↓       ↓
+//       |-------|-------|-------| ← MTop
+//       |  [ ]  |  [ ]  |  [ ]  |
+//       |-------|-------|-------| ← HGap
+//       |  [ ]  |  [ ]  |  [ ]  |
+//       |-------|-------|-------| ← HGap
+//       |  [ ]  |  [ ]  |  [ ]  |
+//       |-------|-------|-------| ← MBottom
+//
+const main = async (argv) => {
+  const source = resolveCwd(argv[1]);
+  const ouputDir = resolveCwd(argv[2]);
+  const cwd = process.cwd();
+  const formatName = resolveFormatName(argv[3], pascalCase);
+  const selector = 'g[id^=icon-]';
+  const svgo = new SVGO(svgoDefaults);
+  const fileOpts = { encoding: 'utf8' };
+  // const sizes = parseSizes(128);
+  // const viewport = parseSizes(2048);
+  // const margins = parseMargins(16);
+  // const gaps = parseGaps(16);
+  const svgSourceContent = await readFile(source, fileOpts);
+  const precision = 4;
+
+  // const [marginTop, marginRight, marginBottom, marginLeft] = margins;
+  // const [vGap, hGap] = gaps;
+  // const [viewportHeight, viewportWidth] = viewport;
+  // const [iconHeight, iconWidth] = sizes;
+
+  const rows = 16;
+  const cols = 16;
+
+  const svgIcons = extractSvg(svgSourceContent, selector);
+  const svgOptimized = await all(svgIcons.map(async ({
+    data,
+    ...rest
+  }) => ({
+    ...await svgo.optimize(data),
+    ...rest,
+  })));
+
+  const indexFile = [];
+  await svgOptimized
+    .map(({ data, ...rest }, idx) => ({
+      data: data
+        // translate grid shape position to standalone
+        .replace(/c([xy])="([\w\-.]+)"/gi, (...matches) => {
+          const [, axis, value] = matches;
+          const pos = { x: idx % cols, y: ~~(idx / rows) };
+          let translatedValue = Number(value) - pos[axis] * 128;
+          translatedValue = ~~((translatedValue) * (10 ** precision)) / 10 ** precision;
+          return `c${axis}="${translatedValue}"`;
+        })
+        // translate grid path data to standalone
+        .replace(/d="([\w\s\-.]+)"/gi, (...matches) => {
+          const [, value] = matches;
+          const col = idx % cols;
+          const row = ~~(idx / rows);
+          const translatedPathData = svgpath(value)
+            .translate(-(col * 128), -(row * 128))
+            .rel()
+            .toString();
+          return `d="${translatedPathData}"`;
+        }),
+      ...rest,
+    }))
+    .forEach(async ({ name, data }) => {
+      const iconName = formatName(name);
+      const iconFileExtension = 'js';
+      indexFile.push(`export { default as ${iconName} } from './${iconName}';`);
+      const content = await formatIconJs(path.resolve(cwd, './template.js'), {
+        iconName,
+        data
+      });
+      await writeFile(path.resolve(ouputDir, `${iconName}.${iconFileExtension}`), `${content}\n`, fileOpts);
+    });
+
+  await writeFile(path.resolve(ouputDir, 'index.js'), `${indexFile.join('\n')}\n`, fileOpts);
+};
+
+main(process.argv.slice(1));

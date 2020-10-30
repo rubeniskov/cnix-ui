@@ -1,0 +1,3 @@
+{
+  "presets": ["@cnix-ui/babel-preset-env"]
+}

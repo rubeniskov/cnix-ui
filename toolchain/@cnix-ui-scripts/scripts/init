@@ -1,0 +1,76 @@
+#!/usr/bin/env node
+/* eslint-disable no-param-reassign */
+/* eslint-disable import/no-dynamic-require */
+/* eslint-disable global-require */
+const path = require('path');
+const { writeFileSync } = require('fs');
+
+const {
+  name: scriptPkgName,
+  version: scriptPkgVersion,
+} = require(path.resolve(__dirname, '../package.json'));
+const setScript = (scripts, scriptName, scriptContent, forced) => {
+  const exists = typeof scripts[scriptName] === 'string';
+
+  if (!exists || forced) {
+    process.stderr.write(`setting up "${scriptName}"\n`);
+    scripts[scriptName] = scriptContent;
+    return true;
+  }
+
+  process.stderr.write(`skipping script "${scriptName}" already exists\n`);
+
+  return false;
+};
+// TODO define flags for each script
+const binName = 'cnix-ui-scripts';
+const scriptDefinitions = {
+  build: `${binName} build`,
+  prepare: `${binName} prepare`,
+  storybook: `${binName} storybook`,
+  link: `${binName} link`,
+  test: `${binName} test`,
+  clean: `${binName} clean`,
+  e2e: `${binName} e2e`,
+  prepublishOnly: `${binName} prepublish`,
+};
+
+const scriptsKey = 'scripts';
+const createTraverseScripts = (pkgJSONData, forced) => (prev, [
+  scriptName,
+  scriptContent,
+]) => setScript(pkgJSONData, scriptName, scriptContent, forced) || prev;
+
+const main = (argv) => {
+  const forced = process.argv.includes('--force');
+  const dir = (!/^--/.test(argv[1]) && argv[1]) || process.cwd();
+
+  if (forced) {
+    process.stderr.write('forced detected, I hope you know what you are doing\n');
+  }
+  const pkgJSONFilename = path.resolve(dir, 'package.json');
+  process.stderr.write(`found "${pkgJSONFilename}"\n`);
+  const pkgJSONData = require(pkgJSONFilename);
+
+  if (typeof pkgJSONData[scriptsKey] !== 'object') {
+    pkgJSONData[scriptsKey] = {};
+  }
+
+  const applied = Object.entries(scriptDefinitions)
+    .reduce(createTraverseScripts(pkgJSONData[scriptsKey], forced), false);
+  if (applied) {
+    if (!pkgJSONData.devDependencies || !pkgJSONData.devDependencies[scriptPkgName]) {
+      process.stderr.write(`adding dependency scripts "${scriptPkgName}@${scriptPkgVersion}"\n`);
+      pkgJSONData.devDependencies = {
+        ...pkgJSONData.devDependencies,
+        [scriptPkgName]: `^${scriptPkgVersion}`,
+      };
+    }
+    process.stderr.write(`saving scripts into "${pkgJSONFilename}"\n`);
+    writeFileSync(pkgJSONFilename, `${JSON.stringify(pkgJSONData, null, 2)}\n`, { encoding: 'utf8' });
+  }
+
+  return 0;
+};
+
+main(process.argv.slice(1));
