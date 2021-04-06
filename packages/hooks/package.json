@@ -1,0 +1,8 @@
+{
+    "name": "@cnix-ui/hooks",
+    "version": "0.0.1",
+    "description": "React hooks",
+    "dependencies": {
+        "@cnix-ui/gl": "^0.0.1"
+    }
+}

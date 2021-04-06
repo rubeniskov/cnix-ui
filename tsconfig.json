@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@cnix-ui/core/*": ["packages/core/src/*"],
+      "@cnix-ui/hooks/*": ["packages/hooks/src/*"],
+      "@cnix-ui/gl/*": ["packages/gl/src/*"],
+      "@cnix-ui/styles/*": ["packages/styles/src/*"]
+    },
+    "skipLibCheck": true,
+    "types": []
+  }
+}

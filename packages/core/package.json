@@ -1,0 +1,9 @@
+{
+    "name": "@cnix-ui/core",
+    "version": "0.0.1",
+    "description": "Core react components",
+    "dependencies": {
+        "@cnix-ui/hooks": "^0.0.1",
+        "@cnix-ui/styles": "^0.0.1"
+    }
+}

@@ -1,0 +1,26 @@
+{
+    "name": "@cnix-ui/packages",
+    "version": "0.0.1",
+    "description": "cnix-ui packages monorepo",
+    "private": true,
+    "scripts": {
+        "prestart": "lerna bootstrap",
+        "setup": "lerna bootstrap",
+        "start": "lerna run start --scope @cnix-ui/app",
+        "lint": "tsc --noEmit && eslint '*/**/*.{js,ts}' --quiet --fix"
+    },
+    "workspaces": {
+        "packages": [
+            "packages/*"
+        ]
+    },
+    "dependencies": {
+        "@typescript-eslint/eslint-plugin": "^4.21.0",
+        "@typescript-eslint/parser": "^4.21.0",
+        "eslint": "^7.23.0",
+        "eslint-config-prettier": "^8.1.0",
+        "eslint-plugin-prettier": "^3.3.1",
+        "lerna": "^4.0.0",
+        "prettier": "^2.2.1"
+    }
+}

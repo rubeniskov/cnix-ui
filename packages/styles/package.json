@@ -1,0 +1,18 @@
+{
+    "name": "@cnix-ui/styles",
+    "version": "0.0.1",
+    "description": "React CSS/JS styles utilities",
+    "dependencies": {
+        "clsx": "^1.1.1",
+        "hoist-non-react-statics": "^3.3.2",
+        "jss-plugin-camel-case": "^10.6.0",
+        "jss-plugin-default-unit": "^10.6.0",
+        "jss-plugin-global": "^10.6.0",
+        "jss-plugin-nested": "^10.6.0",
+        "jss-plugin-props-sort": "^10.6.0",
+        "jss-plugin-rule-value-function": "^10.6.0",
+        "jss-plugin-template": "^10.6.0",
+        "jss-plugin-vendor-prefixer": "^10.6.0",
+        "react-jss": "^10.6.0"
+    }
+}
